@@ -30,13 +30,17 @@ def compare(inLine,gLine):
       y_in = int(initem[2])
       x_g = int(gitem[1])
       y_g = int(gitem[2])
-      dist_thv = 0.01
-      if(pow(pow(x_g-x_in,2)+pow(y_g-y_in,2),0.5) < dist_thv):
+      dist_thv = 60
+      diff = pow(pow(x_g-x_in,2)+pow(y_g-y_in,2),0.5)
+      #print("diff=%f"%diff)
+      if(diff < dist_thv):
+        #print("inside diff=%f"%diff)
         del inList[ind]
         del idset[ind]
         toDel.append(k)
         tpCnt+=1
       else:
+        print("out diff=%f"%diff)
         continue
     else:
       continue
@@ -45,12 +49,16 @@ def compare(inLine,gLine):
   #print(toDel)
   for e in toDel:
     del gList[e]
+  msg = ""
+  if len(gList)!=0:
+    for e in gList:
+      msg = msg+e+","
   fpCnt = len(inList)
   fnCnt = len(gList)
   acc = float(tpCnt)/(tpCnt+fpCnt+fnCnt)
-  print("acc=%f"%(acc))
-  print("tpCnt=%d, fpCnt=%d, fnCnt=%d"%(tpCnt,fpCnt,fnCnt))
-  return acc
+  #print("acc=%f"%(acc))
+  #print("tpCnt=%d, fpCnt=%d, fnCnt=%d"%(tpCnt,fpCnt,fnCnt))
+  return acc,msg
     
     
 
@@ -60,7 +68,15 @@ for i in range(len(input_lines)):
   if line.startswith("./"):
     if line in golden_lines:
       ind = golden_lines.index(line)
-      acc = compare(input_lines[i+1],golden_lines[ind+1])
-      accArr.append([line,acc])
+      acc,msg = compare(input_lines[i+1],golden_lines[ind+1])
+      accArr.append([line.strip(),acc,msg])
 
-print(accArr)
+#print(accArr)
+s=0.0
+for ele in accArr:
+  print(ele[0]+", acc="+str(ele[1]))
+  s+=ele[1]
+  if ele[2] != "":
+    print("Miss "+ele[2])
+avgAcc = s/float(len(accArr))
+print("Avg. accuracy=%f"%avgAcc) 

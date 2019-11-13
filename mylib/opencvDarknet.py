@@ -86,8 +86,9 @@ def detect(imgPath, thresh, inpWidth, inpHeight, classesFile, modelConfig, model
   t, _ = net.getPerfProfile()
   label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
   cv2.putText(frame, label, (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
-
-  outputFile = "out.JPG"
+  e = imgPath.rfind('.')
+  s = imgPath.rfind('/')
+  outputFile = "./inferResult_cpu/"+imgPath[s+1:e]+"_out.JPG"
 # Write the frame with the detection boxes
   cv2.imwrite(outputFile, frame.astype(np.uint8));
   return ret
@@ -128,7 +129,7 @@ if __name__=="__main__":
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
     cv2.putText(frame, label, (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
 
-    output_folder_path = "./inferResult"
+    output_folder_path = "./inferResult_cpu"
     outputFile = output_folder_path+"/out_"+str(ind)+".JPG"
     if not os.path.exists(output_folder_path):
       os.makedirs(output_folder_path)

@@ -98,6 +98,11 @@ def getInfo(test_img_path, netMain, metaMain):
       cv2.putText(test_img, str(ps[0]), (int(ps[1])+offset, int(marker_y[i])), cv2.FONT_HERSHEY_DUPLEX,3, (0, 255, 255), 3, cv2.LINE_AA)
     
   #show for check
+  s = test_img_path.rfind('/')
+  e = test_img_path.rfind('.')
+
+  fn = "./inferResult/"+test_img_path[s+1:e]+"_out.JPG"
+  cv2.imwrite(fn,test_img)
   cv2.imwrite("checkResult.JPG",test_img)
   #resizedImg = cv2.resize(test_img, (int(0.2*test_img.shape[1]), int(0.2*test_img.shape[0])), interpolation=cv2.INTER_CUBIC)
   #cv2.imshow("final",resizedImg)

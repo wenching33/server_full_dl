@@ -13,7 +13,7 @@ index=0
 id_list = []
 name_list = []
 price_list = []
-
+inputSize = 352
 def initProductInfo():
   path = '/home/wenching/ESL/server_full_dl/train_set'
   f=open(path,'r')
@@ -43,7 +43,7 @@ for line in fp.readlines():
     test_img_path = line.strip()
     fp_report.write(test_img_path+"\n")
     begin_t_0 = time.time()
-    ipinf, cropInfo, inf = getInfo(test_img_path)
+    ipinf, cropInfo, inf = getInfo(test_img_path,inputSize)
     end_t_0 = time.time()
     print("Time cost = %f seconds"%(end_t_0-begin_t_0))
         

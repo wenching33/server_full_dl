@@ -9,7 +9,7 @@ import time
 import opencvDarknet as dnet
 
 
-def getInfo(test_img_path):
+def getInfo(test_img_path, size):
   ###### Get marker position & crop barcode #####
   test_img = cv2.imread(test_img_path)
   begin_t = time.time()
@@ -61,9 +61,9 @@ def getInfo(test_img_path):
   products = [[] for i in range(len(marker_y))]
   before = time.time()
   thresh = 0.01
-  inpW = 1824
-  inpH = 1824
-  detections = dnet.detect(test_img_path, thresh, inpW, inpH, "./dl/cfg/esl.names", "./dl/cfg/yolov3_test.cfg", "./dl/cfg/weights/yolov3_2512.weights")
+  inpW = size
+  inpH = size
+  detections = dnet.detect(test_img_path, thresh, inpW, inpH, "./dl/cfg/esl.names", "./dl/cfg/yolov3_test.cfg", "./dl/cfg/weights/yolov3_24240.weights")
   #print(detections) 
   products_list = []
   for i in range(len(detections)):
