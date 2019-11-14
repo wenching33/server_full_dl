@@ -3,14 +3,13 @@ import threading
 from util import *
 #from matplotlib import pyplot as plt
 import cv2
-#from autoSegment import *
+from autoSegment import *
 from markerFinder import *
 import time
-import darknet_modi as dnet
-import dlResultProcess as dlp
+import opencvDarknet as dnet
 
 
-def getInfo(test_img_path, netMain, metaMain):
+def getInfo(test_img_path, size):
   ###### Get marker position & crop barcode #####
   test_img = cv2.imread(test_img_path)
   begin_t = time.time()
@@ -33,7 +32,8 @@ def getInfo(test_img_path, netMain, metaMain):
     else:
       H = marker_y[int(j/2)] - marker_y[int(j/2-1)]
     cropInfo.append([xLeft,y,W,H])
-    cpimg = test_img[y-150:y+150,xLeft-40:xRight+40]
+    print("xLeft=%d, y=%d, W=%d, H=%d"%(xLeft,y,W,H))
+    cpimg = test_img[y-180:y+180,xLeft-40:xRight+40]
     fn="check_barcode_"+str(ind_cp)+".JPG"
     t = cv2.cvtColor(cpimg,cv2.COLOR_BGR2GRAY)
     rr, t = cv2.threshold(t,127,255,cv2.THRESH_BINARY)
@@ -61,11 +61,13 @@ def getInfo(test_img_path, netMain, metaMain):
   products = [[] for i in range(len(marker_y))]
   before = time.time()
   thresh = 0.01
-  detections = dnet.detect(netMain, metaMain, test_img_path.encode("ascii"), thresh)
+  inpW = size
+  inpH = size
+  detections = dnet.detect(test_img_path, thresh, inpW, inpH, "./dl/cfg/esl.names", "./dl/cfg/yolov3_test.cfg", "./dl/cfg/weights/yolov3_24240.weights")
   #print(detections) 
   products_list = []
   for i in range(len(detections)):
-    cls = dlp.getCls(detections[i][0])+1
+    cls = detections[i][0]+1
     x = int(detections[i][2][0])
     y = int(detections[i][2][1])
     conf = detections[i][1]
@@ -88,7 +90,7 @@ def getInfo(test_img_path, netMain, metaMain):
     offset = max(x_min-10,0)
     fPos = []
     for pi in (p):
-      fPos.append([pi[0],pi[1]-offset,pi[2],pi[3]])  #pi[k] is a product, p[k] = [cls,x,y,confi.]
+      fPos.append([pi[0],pi[1]-offset,pi[2]])  #pi[k] is a product, p[k] = [cls,x,y,confi.]
     finalPos.append(fPos)
     end_t = time.time()
     print("Find positions of products line_%d cost %f seconds.\n"%(i,end_t-begin_t))
@@ -98,11 +100,6 @@ def getInfo(test_img_path, netMain, metaMain):
       cv2.putText(test_img, str(ps[0]), (int(ps[1])+offset, int(marker_y[i])), cv2.FONT_HERSHEY_DUPLEX,3, (0, 255, 255), 3, cv2.LINE_AA)
     
   #show for check
-  s = test_img_path.rfind('/')
-  e = test_img_path.rfind('.')
-
-  fn = "./inferResult/"+test_img_path[s+1:e]+"_out.JPG"
-  cv2.imwrite(fn,test_img)
   cv2.imwrite("checkResult.JPG",test_img)
   #resizedImg = cv2.resize(test_img, (int(0.2*test_img.shape[1]), int(0.2*test_img.shape[0])), interpolation=cv2.INTER_CUBIC)
   #cv2.imshow("final",resizedImg)
